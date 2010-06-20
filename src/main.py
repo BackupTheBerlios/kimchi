@@ -64,6 +64,7 @@ def main():
     
     locale = QLocale.system().name()
 #    locale = 'ro_RO'
+
     qtTranslator = QTranslator()
     if qtTranslator.load('qt_' + locale, ':/'):
         app.installTranslator(qtTranslator)
