@@ -61,7 +61,7 @@ class DictionarySelectorPanel(QWidget):
         layout.addStretch()
 
         label.setAlignment(Qt.AlignHCenter)        
-        layout.addWidget(label)
+#        layout.addWidget(label)
         layout.addStretch()
         
         self.setLayout(layout)

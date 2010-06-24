@@ -44,6 +44,8 @@ class ConfigDialog(QDialog):
     def __init__(self, config, parent = None):
         super(ConfigDialog, self).__init__(parent)
         
+        self.setWindowTitle('Manage dictionaries')
+        
         self.config = copy.deepcopy(config)
         
         self.ktablePanel = KTablePanel(self.config)
