@@ -55,7 +55,7 @@ class ConfigDialog(QDialog):
         """
             Button box
         """
-        buttonBox = QDialogButtonBox(QDialogButtonBox.Ok 
+        buttonBox = QDialogButtonBox(QDialogButtonBox.Apply 
                                      | QDialogButtonBox.Cancel)
         
         
@@ -64,22 +64,25 @@ class ConfigDialog(QDialog):
         self.connect(self.ktablePanel, SIGNAL('tableSelected'), 
                      self.kcolumnPanel.resetModel)
         
-        self.connect(buttonBox, SIGNAL("accepted()"),
+        self.connect(buttonBox.button(QDialogButtonBox.Apply), SIGNAL("clicked()"),
                      self, SLOT("accept()"))
         
         self.connect(buttonBox, SIGNAL("rejected()"),
                      self, SLOT("reject()"))
 
         """LAYOUT"""
-        mainLayout = QHBoxLayout()
-        mainLayout.addWidget(self.ktablePanel)
-        mainLayout.addWidget(self.kcolumnPanel)
+        splitter = QSplitter(Qt.Horizontal)
+        self.ktablePanel.setMaximumWidth(self.ktablePanel.minimumSizeHint().width())
+        splitter.addWidget(self.ktablePanel)
+        splitter.addWidget(self.kcolumnPanel)
         
         layout = QVBoxLayout()
-        layout.addLayout(mainLayout)
+        layout.addWidget(splitter)
         layout.addWidget(buttonBox)
         
         self.setLayout(layout)
+        
+        self.ktablePanel.selectTableAtIndex(0)
         
     
     def accept(self):

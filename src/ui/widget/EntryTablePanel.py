@@ -75,6 +75,7 @@ class EntryTablePanel(QWidget):
         
         #self.emit(SIGNAL("closeEditor(QWidget*)"), editor)
         self.connect(self.entryTableDelegate, SIGNAL('cellEditFinished'), self.resizeColumns)
+        self.connect(self.entryTableDelegate, SIGNAL('entryHasChaged'), self.entrySelected)
         
         self.resizeColumns()
         
@@ -92,10 +93,15 @@ class EntryTablePanel(QWidget):
         index = self.entryTableView.currentIndex()
         if not index.isValid():
             return
-        row = index.row()
-        self.entryTableModel.removeRows(row)
         
-        self.resizeColumns()
+        answer = QMessageBox.question(self, self.trUtf8(u'Remove table?'),
+                    self.trUtf8(u'Are you sure you want to remove the selected row?'),
+                    QMessageBox.Yes | QMessageBox.No,
+                    QMessageBox.No)
+        if answer == QMessageBox.Yes:
+            row = index.row()
+            self.entryTableModel.removeRows(row)
+            self.resizeColumns()
         
     def updateEntryList(self):
         pass
@@ -117,5 +123,10 @@ class EntryTablePanel(QWidget):
         for index, column in enumerate(self.ktable.columns):
             if column.type != BIG_TEXT:
                 self.entryTableView.resizeColumnToContents(index)
+                
+    def selectEntryAtIndex(self, rowIndex):
+        modelIndex = self.entryTableModel.index(rowIndex, 0)
+        if modelIndex.isValid():
+            self.entryTableView.setCurrentIndex(modelIndex)
         
         

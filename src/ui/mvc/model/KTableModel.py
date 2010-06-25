@@ -33,6 +33,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from backend.domain.config.ktable import KTable
 
+from properties import NEW_TABLE
+
 
 class KTableModel(QAbstractListModel):
     
@@ -95,7 +97,7 @@ class KTableModel(QAbstractListModel):
         self.beginInsertRows(QModelIndex(), position, position + rows -1)
         
         for row in range(rows):
-            self.tables.insert(position + row, KTable(''))
+            self.tables.insert(position + row, KTable(NEW_TABLE))
         
         self.endInsertRows()
         

@@ -150,4 +150,6 @@ class EntryTableModel(QAbstractTableModel):
     def getEntryById(self, id):
         return self.dataAccessService.getEntryById(self.ktable, id)
      
+    def getEntryByModelIndex(self, modelIndex):
+        return self.entries[modelIndex.row()]
         

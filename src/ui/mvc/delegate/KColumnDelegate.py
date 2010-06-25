@@ -32,6 +32,8 @@ from PyQt4.QtGui import *
 
 import ui.mvc.descriptor.kcolumn_descriptor as descriptor
 
+from properties import NEW_COLUMN
+
 class KColumnDelegate(QItemDelegate):
     
     def __init__(self, parent = None):
@@ -91,6 +93,9 @@ class KColumnDelegate(QItemDelegate):
         or propertyValue== u'Type':
             model.setData(index, QVariant(editor.currentText()))
         else:
-            model.setData(index, QVariant(editor.text()))
+            text = unicode(editor.text())
+            if not text:
+                text = NEW_COLUMN
+                model.setData(index, QVariant(text))
         
         

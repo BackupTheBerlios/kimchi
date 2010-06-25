@@ -43,3 +43,6 @@ APP_ABOUT = '''
 '''% (APP_NAME, APP_DESCRIPTION, APP_VERSION,  
       platform.python_version(),
       QT_VERSION_STR, PYQT_VERSION_STR, platform.system())
+
+NEW_TABLE = u'New Table'
+NEW_COLUMN = u'New Column'

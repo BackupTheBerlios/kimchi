@@ -79,7 +79,7 @@ class KTablePanel(QWidget):
         
 
     def addTable(self):
-        print "addTable"
+#        print "addTable"
         
         row = self.ktableModel.rowCount()
         self.ktableModel.insertRows(row)
@@ -90,19 +90,30 @@ class KTablePanel(QWidget):
         
         
     def removeTable(self):
-        print "removeTable"
+#        print "removeTable"
         
         index = self.ktableView.currentIndex()
         if not index.isValid():
             return
-        
         selectedTable = self.ktableModel.getTableByIndex(index)
-        self.config.tablesToDelete.append(selectedTable)
         
-        row = index.row()
-        self.ktableModel.removeRows(row)
+        answer = QMessageBox.question(self, self.trUtf8(u'Remove table?'),
+                    self.trUtf8(u'Are you sure you want to remove the \'%1\' table?').arg(selectedTable.label),
+                    QMessageBox.Yes | QMessageBox.No,
+                    QMessageBox.No)
+        
+        if answer == QMessageBox.Yes:
+            self.config.tablesToDelete.append(selectedTable)
+            row = index.row()
+            self.ktableModel.removeRows(row)
+
         
     def tableSelected(self, ktable):
 #        print "tableSelected"
         self.emit(SIGNAL('tableSelected'), ktable)
+        
+    def selectTableAtIndex(self, rowIndex):
+        modelIndex = self.ktableModel.index(rowIndex)
+        if modelIndex.isValid():
+            self.ktableView.setCurrentIndex(modelIndex)
         

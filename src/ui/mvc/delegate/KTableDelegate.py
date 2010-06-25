@@ -30,6 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from properties import NEW_TABLE
 
 class KTableDelegate(QItemDelegate):
     
@@ -37,13 +38,13 @@ class KTableDelegate(QItemDelegate):
         super(KTableDelegate, self).__init__(parent)
         
         
-    def createEditor(self, parent, option, index):
-        
-        editor = QLineEdit(parent)
-        self.connect(editor, SIGNAL("returnPressed()"), 
-                         self.commitAndCloseEditor)
-        
-        return editor
+#    def createEditor(self, parent, option, index):
+#        
+#        editor = QLineEdit(parent)
+#        self.connect(editor, SIGNAL("returnPressed()"), 
+#                         self.commitAndCloseEditor)
+#        
+#        return editor
     
     
     def commitAndCloseEditor(self):
@@ -61,6 +62,8 @@ class KTableDelegate(QItemDelegate):
         
         
     def setModelData(self, editor, model, index):
-        
-        model.setData(index, QVariant(editor.text()))
+        text = unicode(editor.text())
+        if not text:
+            text = NEW_TABLE
+        model.setData(index, QVariant(text))
         

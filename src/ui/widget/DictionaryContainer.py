@@ -44,15 +44,15 @@ class DictionaryContainer(QSplitter):
         
 #        self.setTitle(ktable.label)
         
-        self.entryListPanel = EntryTablePanel(appManager, ktable)
+        self.entryTablePanel = EntryTablePanel(appManager, ktable)
         self.entrySearchPanel = EntrySearchPanel(appManager, ktable)
         self.entryDisplayPanel = EntryDisplayPanel(ktable) 
         
         """CONNECTIONS"""
         self.connect(self.entrySearchPanel, SIGNAL("searchTextChanged"),
-                     self.entryListPanel.filterEntryList)
+                     self.entryTablePanel.filterEntryList)
 
-        self.connect(self.entryListPanel, SIGNAL('entrySelected'), self.entryDisplayPanel.update)
+        self.connect(self.entryTablePanel, SIGNAL('entrySelected'), self.entryDisplayPanel.update)
     
         """LAYOUT"""
         self.setOrientation(Qt.Horizontal)
@@ -73,6 +73,9 @@ class DictionaryContainer(QSplitter):
 #        makeSplitterVisible(smallSplitter)
         
         
-        self.addWidget(self.entryListPanel)
+        self.addWidget(self.entryTablePanel)
         self.addWidget(smallSplitter)
+        
+        # select the first row in the table if exists
+        self.entryTablePanel.selectEntryAtIndex(0)
         

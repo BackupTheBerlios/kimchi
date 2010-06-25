@@ -91,6 +91,10 @@ class EntryTableDelegate(QItemDelegate):
             if result is True:
                 model.setData(index, QVariant(editor.text()))
         
+        # emit this signal which notifies other views that 
+        # something in this row has been edited         
+        self.entryHasChanged(model.getEntryByModelIndex(index))
+        
         
     def updateEditorGeometry(self, editor, option, index):
         columnType = self.getColumnTypeByIndex(index.column())
@@ -103,6 +107,10 @@ class EntryTableDelegate(QItemDelegate):
         
     def cellEditFinished(self):
         self.emit(SIGNAL("cellEditFinished"))
+        
+    def entryHasChanged(self, modelIndex):
+        self.emit(SIGNAL('entryHasChanged'), modelIndex)
+        
         
     def getColumnTypeByIndex(self, colIndex):
         return self.ktable.columns[colIndex].type

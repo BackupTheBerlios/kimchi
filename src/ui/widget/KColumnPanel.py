@@ -76,7 +76,8 @@ class KColumnPanel(QWidget):
 
     def addColumn(self):
 #        print "addColumn"
-        
+        if self.kcolumnModel is None:
+            return
         row = self.kcolumnModel.rowCount()
         self.kcolumnModel.insertRows(row)
         index = self.kcolumnModel.index(row, 0)
@@ -91,8 +92,17 @@ class KColumnPanel(QWidget):
         index = self.kcolumnView.currentIndex()
         if not index.isValid():
             return
-        row = index.row()
-        self.kcolumnModel.removeRows(row)
+        
+        selectedColumn = self.kcolumnModel.getColumnByIndex(index)
+        
+        answer = QMessageBox.question(self, self.trUtf8(u'Remove table?'),
+                    self.trUtf8(u'Are you sure you want to remove the \'%1\' column?').arg(selectedColumn.label),
+                    QMessageBox.Yes | QMessageBox.No,
+                    QMessageBox.No)
+        
+        if answer == QMessageBox.Yes:
+            row = index.row()
+            self.kcolumnModel.removeRows(row)
         
     def resetModel(self, ktable):
 #        print "resetModel"

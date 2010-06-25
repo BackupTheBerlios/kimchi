@@ -35,6 +35,8 @@ from PyQt4.QtGui import *
 import ui.mvc.descriptor.kcolumn_descriptor as kcolumnDescriptor
 from backend.domain.config.kcolumn import KColumn
 
+from properties import NEW_COLUMN
+
 class KColumnModel(QAbstractTableModel):
     
     def __init__(self, columns):
@@ -98,7 +100,7 @@ class KColumnModel(QAbstractTableModel):
         self.beginInsertRows(QModelIndex(), position, position + rows -1)
         
         for row in range(rows):
-            self.columns.insert(position + row, KColumn(u''))
+            self.columns.insert(position + row, KColumn(NEW_COLUMN))
         
         self.endInsertRows()
         
@@ -114,4 +116,7 @@ class KColumnModel(QAbstractTableModel):
         
         return True
 
+    def getColumnByIndex(self, index):
+        return self.columns[index.row()]
+    
         
