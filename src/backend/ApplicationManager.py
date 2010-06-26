@@ -32,6 +32,10 @@ from backend.service.data_access_service import DataAccessService
 from backend.config.ConfigEngine import ConfigEngine
 from backend.service.config_data_access_service import ConfigDataAccessService
 
+import backend.service.storage_manager as storageManager
+
+from copy import copy
+
 class ApplicationManager(object):
     
     def __init__(self):
@@ -48,7 +52,8 @@ class ApplicationManager(object):
         """
       
         """
-        self._daoEngine = DaoEngine()
+        dbPath = copy(storageManager.appFilePath)
+        self._daoEngine = DaoEngine(dbPath)
         
         """
             configEngine reads current configuration 
@@ -72,4 +77,23 @@ class ApplicationManager(object):
     def updateConfiguration(self, newConfig):
         self.configEngine.update(newConfig)
         self.initDataAccessService()
+        
+    @property
+    def appStorageDir(self):
+        return copy(storageManager.appFolderPath)
+    
+    @property
+    def appFileName(self):
+        return copy(storageManager.appFileName)
+    
+    @property
+    def appFilePath(self):
+        return copy(storageManager.appFilePath)
+    
+    def createBackup(self, backupPath):
+        storageManager.createBackup(backupPath)
+        
+    def restoreBackup(self, backupPath):
+        storageManager.restoreBackup(backupPath)
+        
         

@@ -28,38 +28,25 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 '''
 
-import sqlite3
+import os
+import shutil
 
-import user_storage_manager as userStorageManager
-import config_storage_manager as configStorageManager
+appFileName = 'kimchi.db'
+appFolderName = '.kimchi'
 
+homeFolder = os.path.expanduser('~')
+appFolderPath = homeFolder + os.sep + appFolderName
+appFilePath = appFolderPath + os.sep + appFileName
 
+def createAppFolder():
+    '''create app folder if it doesn't exists already'''
+    if not os.path.isdir(appFolderPath):
+        os.mkdir(appFolderPath)
+        
 
-class DaoEngine(object):
+def createBackup(backupPath):
+    shutil.copyfile(appFilePath, backupPath)
     
-    def __init__(self, dbPath):
-        
-        self.dbPath = dbPath
-        
-        self.connection = None
-        
-        self.initConfigStorage()
-    
-    
-        
-    def initConfigStorage(self):
-        """Config Storage consists of the following tables:
-            ktable - holds the definitions for user defined tables 
-            kcolumn - holds the column definitions for user defined tables
-        """
-        sqlite3.enable_callback_tracebacks(True)
-        self.connection = sqlite3.connect(self.dbPath)
-        self.connection.row_factory=sqlite3.Row
-        
-        configStorageManager.createConfigTables(self.connection)
-    
-    def initUserStorage(self, config):
-        
-        userStorageManager.createTablesForEntries(self.connection, config)
-
+def restoreBackup(backupPath):
+    shutil.copyfile(backupPath, appFilePath)
 

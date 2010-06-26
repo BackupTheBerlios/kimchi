@@ -96,6 +96,6 @@ class KColumnDelegate(QItemDelegate):
             text = unicode(editor.text())
             if not text:
                 text = NEW_COLUMN
-                model.setData(index, QVariant(text))
+            model.setData(index, QVariant(text))
         
         
