@@ -57,6 +57,9 @@ class MainPanel(QSplitter):
         self.connect(self.dictSelectorPanel, SIGNAL('dictionarySelected'),
                      self.updateDictContainerPanel)
         
+        self.connect(self, SIGNAL('splitterMoved(int, int)'), self.updateMainPanelState)
+        self.connect(self, SIGNAL('destroyed()'), self.mainPanelDestroyed)
+        
         """ LAYOUT """
 #        splitter = QSplitter(self)
 #        splitter.setOrientation(Qt.Horizontal)
@@ -67,18 +70,35 @@ class MainPanel(QSplitter):
 #        self.setStretchFactor(0,1)
 #        self.setStretchFactor(1,5)
         
-        self.dictSelectorPanel.setMaximumWidth(self.dictSelectorPanel.sizeHint().width())
+#        self.dictSelectorPanel.setMaximumWidth(self.dictSelectorPanel.sizeHint().width())
         self.addWidget(self.dictSelectorPanel)
         self.addWidget(self.dictContainerPanel)
 #        self.layout=QHBoxLayout()
 #        self.layout.addWidget(splitter)
 #        self.layout.addWidget(self.dictContainerPanel)
 #        self.setLayout(self.layout)
+
+        self.mainPanelState = None
+        self.restoreMainPanelState()
+        
         
     
     def updateDictContainerPanel(self, ktable):
         dictContainer = self.dictWidgets[ktable]
         self.dictContainerPanel.setCurrentWidget(dictContainer)
         
-    
+    def updateMainPanelState(self):
+        self.mainPanelState = self.saveState()
+        
+    def saveMainPanelState(self):
+        settings=QSettings()
+        settings.setValue('MainPanel/State', QVariant(self.mainPanelState))
+        
+    def restoreMainPanelState(self):
+        settings=QSettings()
+        self.mainPanelState = settings.value('MainPanel/State').toByteArray() 
+        self.restoreState(self.mainPanelState)
+        
+    def mainPanelDestroyed(self):
+        self.saveMainPanelState()
         

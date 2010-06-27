@@ -39,6 +39,7 @@ import resources
 import os
 from datetime import datetime
 from backend.service.storage_manager import appFilePath
+from ui.dialog.FileDialogWithValidation import FileDialogWithValidation
 
 class MainWindow(QMainWindow):
     
@@ -46,33 +47,22 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(parent)
         
         self.appManager = appManager
-#        self.dataAccessService = configEngine.dataAccessService
         
         self.resize(QSize(800,600))
         
-#        self.tagFilterPanel = TagFilterPanel(dataAccessService)
-#        self.mainPanel = MainPanel(dataAccessService, configEngine)
-#        self.tagChooserPanel = TagChooserPanel(dataAccessService)
-        
-#        self.mainSplitter = QSplitter(Qt.Horizontal)
-#        
-#        self.mainSplitter.addWidget(self.tagFilterPanel)
-#        self.mainSplitter.addWidget(self.mainPanel)
-#        self.mainSplitter.addWidget(self.tagChooserPanel)
-#        
-#        self.mainSplitter.setStretchFactor(0,1)
-#        self.mainSplitter.setStretchFactor(1,3)
-#        self.mainSplitter.setStretchFactor(2,1)
-        
         self.restoreMainWindowState()
-        
-#        self.setCentralWidget(self.mainPanel)
         
         self.createMenu()
         
+        self.mainPanel = None
         self.initMainPanel()
         
         self.setWindowTitle(APP_NAME)
+        
+    def initMainPanel(self):
+        self.mainPanel = MainPanel(self.appManager)
+        self.setCentralWidget(self.mainPanel)
+        
         
     def saveMainWindowState(self):
         settings=QSettings()
@@ -87,9 +77,6 @@ class MainWindow(QMainWindow):
     def closeEvent(self,event):
         self.saveMainWindowState()
         
-    def initMainPanel(self):
-        mainPanel = MainPanel(self.appManager)
-        self.setCentralWidget(mainPanel)
     
     def createAction(self, text, slot, shortcut = None, icon = None,
                      tip = None):
@@ -152,19 +139,30 @@ class MainWindow(QMainWindow):
         suggestedFileName = '%s-%s.%s' % (name, timestamp, ext)
         suggestedFolder = self.appManager.appStorageDir
         suggestedFilePath = suggestedFolder + os.sep + suggestedFileName
-        choosenPath = QFileDialog.getSaveFileName(self, 
-                        self.trUtf8('Select a name for the backup'), 
-                        suggestedFilePath)
         
-        if choosenPath.isEmpty():
-            return
-        if choosenPath == appFilePath:
-            QMessageBox.warning(self, self.trUtf8('Error'),
-                                self.trUtf8('Cannot ovewrite the base file'))
-        else:
+        fileDialog = FileDialogWithValidation(self, [appFilePath])
+        fileDialog.setFileMode(QFileDialog.AnyFile)
+        fileDialog.selectFile(suggestedFilePath)
+        
+        if fileDialog.exec_():
+            choosenPath = fileDialog.selectedFiles()[0]
             self.appManager.createBackup(unicode(choosenPath))
     
     def restoreBackup(self):
-        pass
+        
+        appFilePath = self.appManager.appFilePath
+        
+        suggestedFolder = self.appManager.appStorageDir
+        
+        fileDialog = FileDialogWithValidation(self, [appFilePath])
+        fileDialog.setFileMode(QFileDialog.ExistingFile)
+        fileDialog.selectFile(suggestedFolder)
+        
+        if fileDialog.exec_():
+            choosenPath = fileDialog.selectedFiles()[0]
+            self.appManager.restoreBackup(unicode(choosenPath))
+            
+            
+    
         
         

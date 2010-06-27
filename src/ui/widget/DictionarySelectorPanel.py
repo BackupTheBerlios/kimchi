@@ -45,7 +45,7 @@ class DictionarySelectorPanel(QWidget):
         super(DictionarySelectorPanel, self).__init__(parent)
                 
         self.tablePanel = KTablePanel(config, False, False, self)
-        self.tablePanel.setMaximumWidth(self.tablePanel.minimumSizeHint().width())
+        self.tablePanel.setMaximumWidth(self.tablePanel.sizeHint().width())
 #        util.setGreenBackground(self.tablePanel)        
 
         label = QLabel(u'김치')

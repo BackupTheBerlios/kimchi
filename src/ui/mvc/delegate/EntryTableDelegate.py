@@ -50,7 +50,7 @@ class EntryTableDelegate(QItemDelegate):
             editor = QLineEdit(parent)
         else:
             editor = BigTextEditorDialog(parent)
-            
+#            editor.setFocus()
             editor.show()
 #            editor.move(300,300)
         

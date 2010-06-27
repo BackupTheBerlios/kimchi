@@ -31,56 +31,24 @@ POSSIBILITY OF SUCH DAMAGE.
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-class BigTextEditorDialog(QDialog):
+class FileDialogWithValidation(QFileDialog):
     
-    def __init__(self, parent = None):
-        super(BigTextEditorDialog, self).__init__(parent)
+    def __init__(self, parent = None, invalidFilenames = None):
+        super(FileDialogWithValidation, self).__init__(parent)
         
-        self.setModal(True)
-        self.textArea = QTextEdit()
-        self.ok = False
-        
-        """
-            Button box
-        """
-        buttonBox = QDialogButtonBox(QDialogButtonBox.Ok 
-                                     | QDialogButtonBox.Cancel)
-        
-        """CONNECTIONS"""
-        self.connect(buttonBox, SIGNAL("accepted()"),
-                     self.accept)
-        
-        self.connect(buttonBox, SIGNAL("rejected()"),
-                     self.reject)
-        
-        """LAYOUT"""
-        
-        layout = QVBoxLayout()
-        layout.addWidget(self.textArea)
-        layout.addWidget(buttonBox)
-        
-        self.setLayout(layout)
-        
-        self.textArea.setFocus()
-        self.textArea.grabKeyboard()
-        
-    def setText(self, text):
-        self.textArea.setPlainText(text)
-        
-    def text(self):
-        return self.textArea.toPlainText()
+        self.invalidFilenames = invalidFilenames
+
     
     def accept(self):
+        choosenFilename = self.selectedFiles()[0]
+        if choosenFilename in self.invalidFilenames:
+            QMessageBox.warning(self, self.trUtf8('Error'),
+                                self.trUtf8('Cannot ovewrite the base file'))
+            return
+        QFileDialog.accept(self)
 #        print 'Accepted'
-        self.ok = True
-        QDialog.accept(self)
         
-#        self.done(QDialog.Accepted)
         
     def reject(self):
-#        print 'Rejected'
-        QDialog.reject(self)
-#        self.done(QDialog.Rejected)
-#        self.close()
-
+        QFileDialog.reject(self)
         
