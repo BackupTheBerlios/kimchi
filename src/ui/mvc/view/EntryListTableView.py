@@ -37,6 +37,9 @@ class EntryListTableView(QTableView):
         
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         
+        #disable editing
+        self.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        
 
     def selectionChanged(self, selected, deselected):
         super(EntryListTableView, self).selectionChanged(selected, deselected)

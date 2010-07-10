@@ -86,42 +86,42 @@ class EntryTableModel(QAbstractTableModel):
         return len(self.entryColumnsNames)
 
     
-    def setData(self, index, value, role = Qt.EditRole):
-        
-        if index.isValid() and 0 <= index.row() < len(self.entries):
-
-            entry = self.entries[index.row()]
-            
-            column = index.column()
-            setattr(entry, self.entryColumnsNames[column],
-                     unicode(value.toString()))
-            
-            self.dataAccessService.updateEntry(entry, self.ktable)
-            self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"),
-                      index, index)
-            
-            return True
-        
-        return False
+#    def setData(self, index, value, role = Qt.EditRole):
+#        
+#        if index.isValid() and 0 <= index.row() < len(self.entries):
+#
+#            entry = self.entries[index.row()]
+#            
+#            column = index.column()
+#            setattr(entry, self.entryColumnsNames[column],
+#                     unicode(value.toString()))
+#            
+#            self.dataAccessService.updateEntry(entry, self.ktable)
+#            self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"),
+#                      index, index)
+#            
+#            return True
+#        
+#        return False
 
     
-    def flags(self, index):
-        if not index.isValid():
-            return Qt.ItemIsEnabled
-        return Qt.ItemFlags(QAbstractTableModel.flags(self, index) |
-                            Qt.ItemIsEditable)
+#    def flags(self, index):
+#        if not index.isValid():
+#            return Qt.ItemIsEnabled
+#        return Qt.ItemFlags(QAbstractTableModel.flags(self, index) |
+#                            Qt.ItemIsEditable)
         
-    def insertRows(self, position, rows = 1, index = QModelIndex()):
-        self.beginInsertRows(QModelIndex(), position, position + rows -1)
-        
-        for row in range(rows):
-            entry = self.createEntry()
-            self.dataAccessService.addEntry(entry, self.ktable)
-            self.entries.insert(position + row, entry)
-        
-        self.endInsertRows()
-        
-        return True
+#    def insertRows(self, position, rows = 1, index = QModelIndex()):
+#        self.beginInsertRows(QModelIndex(), position, position + rows -1)
+#        
+#        for row in range(rows):
+#            entry = self.createEntry()
+#            self.dataAccessService.addEntry(entry, self.ktable)
+#            self.entries.insert(position + row, entry)
+#        
+#        self.endInsertRows()
+#        
+#        return True
         
     def removeRows(self, position, rows = 1, index = QModelIndex()):
         self.beginRemoveRows(QModelIndex(), position, position + rows -1)
@@ -152,4 +152,25 @@ class EntryTableModel(QAbstractTableModel):
      
     def getEntryByModelIndex(self, modelIndex):
         return self.entries[modelIndex.row()]
+    
+    def updateRow(self, entry, modelIndex):
+        self.entries[modelIndex.row()] = entry
+        self.dataAccessService.updateEntry(entry, self.ktable)
+        self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"),
+                      modelIndex, modelIndex)
+
+        
+    def addRow(self, entry, position = None):
+        if position is None:
+            position = self.rowCount()
+        
+        self.beginInsertRows(QModelIndex(), position, position)
+        
+        self.dataAccessService.addEntry(entry, self.ktable)
+        self.entries.insert(position, entry)
+        
+        self.endInsertRows()
+        
+        modelIndex = self.index(position, 0)
+        return modelIndex
         

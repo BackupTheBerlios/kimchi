@@ -42,40 +42,82 @@ class DictionaryContainer(QSplitter):
     def __init__(self, appManager, ktable, parent = None):
         super(DictionaryContainer, self).__init__(parent)
         
-#        self.setTitle(ktable.label)
-        
         self.entryTablePanel = EntryTablePanel(appManager, ktable)
         self.entrySearchPanel = EntrySearchPanel(appManager, ktable)
         self.entryDisplayPanel = EntryDisplayPanel(ktable) 
         
-        """CONNECTIONS"""
-        self.connect(self.entrySearchPanel, SIGNAL("searchTextChanged"),
-                     self.entryTablePanel.filterEntryList)
-
-        self.connect(self.entryTablePanel, SIGNAL('entrySelected'), self.entryDisplayPanel.update)
+        
+        
     
         """LAYOUT"""
         self.setOrientation(Qt.Horizontal)
         
-        smallSplitter = QSplitter(Qt.Vertical)
+        self.smallSplitter = QSplitter(Qt.Vertical)
         self.entrySearchPanel.setMaximumHeight(self.entrySearchPanel.minimumSizeHint().height())
         sa = QScrollArea()
         sa.setWidgetResizable(True)
         sa.setWidget(self.entrySearchPanel)
-        smallSplitter.addWidget(sa)
+        self.smallSplitter.addWidget(sa)
 #        smallSplitter.addWidget(self.entrySearchPanel)
         
         sa = QScrollArea()
         sa.setWidgetResizable(True)
         sa.setWidget(self.entryDisplayPanel)
-        smallSplitter.addWidget(sa)
+        self.smallSplitter.addWidget(sa)
 
 #        makeSplitterVisible(smallSplitter)
         
         
         self.addWidget(self.entryTablePanel)
-        self.addWidget(smallSplitter)
+        self.addWidget(self.smallSplitter)
         
         # select the first row in the table if exists
         self.entryTablePanel.selectEntryAtIndex(0)
         
+        # variables used to save and restore 
+        # this views splitters position
+        self.mainSplitterState = QByteArray()
+        self.smallSplitterState = QByteArray()
+        
+        self.mainSplitterStateId = 'DictionaryContainer%d/MainSplitterState' % (ktable.id)
+        self.smallSplitterStateId = 'DictionaryContainer%d/SmallSplitterState' % (ktable.id)
+        
+        self.restoreWidgetState()
+        
+        """CONNECTIONS"""
+        self.connect(self.entrySearchPanel, SIGNAL("searchTextChanged"),
+                     self.entryTablePanel.filterEntryList)
+        self.connect(self.entryTablePanel, SIGNAL('entrySelected'), self.entryDisplayPanel.update)
+        
+        # for saving the splitters state
+        self.connect(self, SIGNAL('splitterMoved(int, int)'), self.updateMainSplitterState)
+        self.connect(self.smallSplitter, SIGNAL('splitterMoved(int, int)'), self.updateSmallSplitterState)
+        self.connect(self, SIGNAL('destroyed()'), self.onWidgetDestroy)
+         
+        
+        
+    '''Methods used to save and restore splitter positions
+    '''    
+    def updateMainSplitterState(self):
+        self.mainSplitterState = self.saveState()
+        
+    def updateSmallSplitterState(self):
+        self.smallSplitterState = self.smallSplitter.saveState()
+        
+    def saveWidgetState(self):
+        settings=QSettings()
+        settings.setValue(self.mainSplitterStateId, QVariant(self.mainSplitterState))
+        settings.setValue(self.smallSplitterStateId, QVariant(self.smallSplitterState))
+    
+    def restoreWidgetState(self):
+        settings=QSettings()
+        
+        self.mainSplitterState = settings.value(self.mainSplitterStateId).toByteArray()
+        self.restoreState(self.mainSplitterState)
+
+        self.smallSplitterState = settings.value(self.smallSplitterStateId).toByteArray()
+        self.smallSplitter.restoreState(self.smallSplitterState)
+        
+    def onWidgetDestroy(self):
+        self.saveWidgetState() 
+            

@@ -34,6 +34,7 @@ from ui.mvc.model.EntryTableModel import EntryTableModel
 from ui.mvc.delegate.EntryTableDelegate import EntryTableDelegate
 from ui.mvc.view.EntryListTableView import EntryListTableView
 from backend.domain.config.kcolumn import BIG_TEXT
+from ui.dialog.EntryEditDialog import EntryEditDialog
 
 class EntryTablePanel(QWidget):
     
@@ -47,15 +48,17 @@ class EntryTablePanel(QWidget):
         self.dataAccessService = appManager.dataAccessService
         
         self.entryTableModel = EntryTableModel(appManager, ktable)
-        self.entryTableDelegate = EntryTableDelegate(ktable)
+#        self.entryTableDelegate = EntryTableDelegate(ktable)
         
         self.entryTableView = EntryListTableView(self)
         self.entryTableView.setModel(self.entryTableModel)
-        self.entryTableView.setItemDelegate(self.entryTableDelegate)
+#        self.entryTableView.setItemDelegate(self.entryTableDelegate)
         
         self.addEntryButton = QPushButton("Add")
         self.removeEntryButton = QPushButton("Remove")
         
+        
+        """LAYOUT"""
         layout=QVBoxLayout()
         layout.addWidget(self.entryTableView)
         
@@ -68,40 +71,53 @@ class EntryTablePanel(QWidget):
         
         self.setLayout(layout)
         
+        
+        """CONNECTIONS"""
         self.connect(self.addEntryButton, SIGNAL('pressed()'), self.addEntry)
         self.connect(self.removeEntryButton, SIGNAL('pressed()'), self.removeEntry)
         
         self.connect(self.entryTableView, SIGNAL('entrySelected'), self.entrySelected)
         
-        #self.emit(SIGNAL("closeEditor(QWidget*)"), editor)
-        self.connect(self.entryTableDelegate, SIGNAL('cellEditFinished'), self.resizeColumns)
-        self.connect(self.entryTableDelegate, SIGNAL('entryHasChaged'), self.entrySelected)
+        self.connect(self.entryTableView, SIGNAL('activated(QModelIndex)'), self.editEntry)
+        
         
         self.resizeColumns()
         
-    def addEntry(self):
-        row = self.entryTableModel.rowCount()
-        self.entryTableModel.insertRows(row)
-        index = self.entryTableModel.index(row, 0)
-        self.entryTableView.setFocus()
-        self.entryTableView.setCurrentIndex(index)
-        self.entryTableView.edit(index)
+    def editEntry(self, modelIndex):
+        entry = self.entryTableModel.getEntryByModelIndex(modelIndex)
+        dlg = EntryEditDialog(entry, self.ktable, self)
+        if dlg.exec_():
+            self.entryTableModel.updateRow(dlg.entry, modelIndex)
+            
         
-#        self.resizeColumns()
+    def addEntry(self):
+        entry = self.entryTableModel.createEntry()
+        dlg = EntryEditDialog(entry, self.ktable, self)
+        if dlg.exec_():
+            modelIndex = self.entryTableModel.addRow(entry)
+            
+            self.entryTableView.setFocus()
+            self.entryTableView.setCurrentIndex(modelIndex)
+            self.resizeColumns()
         
     def removeEntry(self):
-        index = self.entryTableView.currentIndex()
-        if not index.isValid():
-            return
-        
-        answer = QMessageBox.question(self, self.trUtf8(u'Remove table?'),
-                    self.trUtf8(u'Are you sure you want to remove the selected row?'),
+        answer = QMessageBox.question(self, self.trUtf8(u'Remove entry?'),
+                    self.trUtf8(u'Are you sure you want to remove the selected row(s)?'),
                     QMessageBox.Yes | QMessageBox.No,
                     QMessageBox.No)
         if answer == QMessageBox.Yes:
-            row = index.row()
-            self.entryTableModel.removeRows(row)
+            indexes = self.entryTableView.selectedIndexes()
+            rows = set()
+            for index in indexes:
+                if index.isValid():
+                    rows.add(index.row()) 
+            rows = sorted(rows, reverse = True)
+            print rows
+            for row in rows:
+                self.entryTableModel.removeRows(row)
+                    
             self.resizeColumns()
+            
         
     def updateEntryList(self):
         pass
