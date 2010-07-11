@@ -33,8 +33,9 @@ from ui.widget.EntrySearchWidget import EntrySearchWidget
 
 
 import ui.util as util
+from ui.widget.ResizableFont import ResizableFont
  
-class EntrySearchPanel(QWidget):
+class EntrySearchPanel(ResizableFont, QWidget):
     
     def __init__(self, appManager, ktable, parent = None):
         super(EntrySearchPanel, self).__init__(parent)

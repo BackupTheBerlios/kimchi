@@ -144,5 +144,8 @@ class EntryTablePanel(QWidget):
         modelIndex = self.entryTableModel.index(rowIndex, 0)
         if modelIndex.isValid():
             self.entryTableView.setCurrentIndex(modelIndex)
-        
+            
+    def setFont(self, font):
+        QWidget.setFont(font)
+        self.resizeColumns()
         

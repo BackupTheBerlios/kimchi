@@ -27,37 +27,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 '''
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from ui.widget.ResizableFont import ResizableFont
 
-class EntryListTableView(ResizableFont, QTableView):
-    
-    def __init__(self, parent = None):
-        super(EntryListTableView, self).__init__(parent)
+class ResizableFont(object):
+    pass
         
-        self.setSelectionBehavior(QAbstractItemView.SelectRows)
-        
-        #disable editing
-        self.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        
-#        self.connect(qApp, SIGNAL()
-        
-
-    def selectionChanged(self, selected, deselected):
-        super(EntryListTableView, self).selectionChanged(selected, deselected)
-        
-        if not selected.indexes():
-            return
-        
-        firstSelectedIndex = selected.indexes()[0]
-        selectedEntryId, ok = self.model().data(firstSelectedIndex, Qt.UserRole).toInt()
-        
-        if ok and selectedEntryId > 0:
-            selectedEntry = self.model().getEntryById(selectedEntryId)
-            self.emit(SIGNAL('entrySelected'), selectedEntry)
-#            print 'selectionChanged %d' % selectedEntry.id
-#        else:
-#            print 'Invalid selection'
-#        print 'selectionChanged %d' % selectedEntryId
-

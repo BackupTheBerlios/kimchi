@@ -71,8 +71,7 @@ class DictionaryContainer(QSplitter):
         self.addWidget(self.entryTablePanel)
         self.addWidget(self.smallSplitter)
         
-        # select the first row in the table if exists
-        self.entryTablePanel.selectEntryAtIndex(0)
+       
         
         # variables used to save and restore 
         # this views splitters position
@@ -88,13 +87,18 @@ class DictionaryContainer(QSplitter):
         self.connect(self.entrySearchPanel, SIGNAL("searchTextChanged"),
                      self.entryTablePanel.filterEntryList)
         self.connect(self.entryTablePanel, SIGNAL('entrySelected'), self.entryDisplayPanel.update)
+#        self.connect(self.entryTablePanel, SIGNAL('entrySelected'), self.test)
         
         # for saving the splitters state
         self.connect(self, SIGNAL('splitterMoved(int, int)'), self.updateMainSplitterState)
         self.connect(self.smallSplitter, SIGNAL('splitterMoved(int, int)'), self.updateSmallSplitterState)
         self.connect(self, SIGNAL('destroyed()'), self.onWidgetDestroy)
-         
         
+        # select the first row in the table if exists
+        self.entryTablePanel.selectEntryAtIndex(0)
+         
+    def test(self, entry):
+        print 'bla' + str(entry)  
         
     '''Methods used to save and restore splitter positions
     '''    

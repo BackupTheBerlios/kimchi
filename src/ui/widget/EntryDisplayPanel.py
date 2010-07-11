@@ -33,6 +33,7 @@ from PyQt4.QtGui import *
 import ui.util as util
 
 from backend.domain.config.kcolumn import SMALL_TEXT, BIG_TEXT
+from ui.widget.ResizableFont import ResizableFont
 
 #class LabelContainer(QWidget):
 #    
@@ -46,7 +47,7 @@ from backend.domain.config.kcolumn import SMALL_TEXT, BIG_TEXT
 #        
 #        self.setLayout(layout)
 
-class EntryDisplayPanel(QWidget):
+class EntryDisplayPanel(ResizableFont, QWidget):
     
     def __init__(self, ktable, parent = None):
         super(EntryDisplayPanel, self).__init__(parent)
@@ -66,7 +67,7 @@ class EntryDisplayPanel(QWidget):
         
         for index, column in enumerate(columns):
             label = QLabel(column.label + ':')
-            label.setMaximumWidth(label.minimumSizeHint().width())
+#            label.setMaximumWidth(label.minimumSizeHint().width())
             layout.addWidget(label, index, 0)
             layout.setAlignment(label, Qt.AlignTop)
 #            util.setGreenBackground(label)

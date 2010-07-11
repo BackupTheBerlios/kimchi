@@ -50,14 +50,18 @@ class MainWindow(QMainWindow):
         
         self.resize(QSize(800,600))
         
-        self.restoreMainWindowState()
         
         self.createMenu()
+        self.createToolBar()
         
         self.mainPanel = None
         self.initMainPanel()
         
         self.setWindowTitle(APP_NAME)
+        
+        
+        
+        self.restoreMainWindowState()
         
     def initMainPanel(self):
         self.mainPanel = MainPanel(self.appManager)
@@ -68,11 +72,17 @@ class MainWindow(QMainWindow):
         settings=QSettings()
         settings.setValue('MainWindow/Geometry', QVariant(self.saveGeometry()))
         settings.setValue('MainWindow/State', QVariant(self.saveState()))
+        settings.setValue('Application/FontSize', QVariant(self.fontSize))
         
     def restoreMainWindowState(self):
         settings=QSettings()
         self.restoreGeometry(settings.value('MainWindow/Geometry').toByteArray())
         self.restoreState(settings.value('MainWindow/State').toByteArray())
+        
+        self.fontSize, ok = settings.value('Application/FontSize').toInt()
+        if not ok:
+            self.fontSize = qApp.font().pointSize()
+        self.changeFontSize()
         
     def closeEvent(self,event):
         self.saveMainWindowState()
@@ -119,6 +129,24 @@ class MainWindow(QMainWindow):
                 'Alt+A', 'appIcon')
         helpMenu.addAction(aboutAction)
         
+        
+    def createToolBar(self):
+        toolBar = self.addToolBar('toolBar')
+        toolBar.setObjectName('toolBar')
+        
+        chooseFontAction = self.createAction(self.trUtf8('Select font'),
+                                self.chooseFont)
+        increaseFontSizeAction = self.createAction(self.trUtf8('+'),
+                                self.increaseFontSize)
+        
+        decreaseFontSizeAction = self.createAction(self.trUtf8('-'),
+                                self.decreaseFontSize)
+        
+        toolBar.addAction(chooseFontAction)
+        toolBar.addAction(increaseFontSizeAction)
+        toolBar.addAction(decreaseFontSizeAction)
+        
+        
     def showConfigDialog(self):
         configDialog = ConfigDialog(self.appManager.configEngine.config, self)
         if configDialog.exec_():
@@ -163,6 +191,23 @@ class MainWindow(QMainWindow):
             self.appManager.restoreBackup(unicode(choosenPath))
             
             
+    def chooseFont(self):
+#        print self.font()
+        font, ok = QFontDialog.getFont(self.font(), self)
+        if ok:
+#            self.setFont(font)
+            QApplication.setFont(font,'ResizableFont')
+            
+    def increaseFontSize(self):
+        self.fontSize += 1
+        self.changeFontSize()
     
-        
+    def decreaseFontSize(self):
+        self.fontSize -= 1
+        self.changeFontSize()
+    
+    def changeFontSize(self):
+        font = qApp.font()
+        font.setPointSize(self.fontSize)
+        qApp.setFont(font, 'ResizableFont')    
         

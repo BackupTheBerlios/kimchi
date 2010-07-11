@@ -29,9 +29,10 @@ POSSIBILITY OF SUCH DAMAGE.
 '''
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from ui.widget.ResizableFont import ResizableFont
 
 
-class EntrySearchWidget(QWidget):
+class EntrySearchWidget(ResizableFont, QWidget):
     
     def __init__(self, columnName, columnLabel, parent = None):
         super(EntrySearchWidget, self).__init__(parent)
@@ -49,6 +50,7 @@ class EntrySearchWidget(QWidget):
         self.setLayout(layout)
         
         self.connect(self.lineEdit, SIGNAL("textEdited(QString)"), self.searchTextChanged)
+        
         
     def searchTextChanged(self):
 #        print 'searchTextChanged:%s' % self.lineEdit.text()
