@@ -88,6 +88,8 @@ class EntryTablePanel(QWidget):
         dlg = EntryEditDialog(entry, self.ktable, self)
         if dlg.exec_():
             self.entryTableModel.updateRow(dlg.entry, modelIndex)
+            self.entrySelected(dlg.entry)
+            self.resizeColumns()
             
         
     def addEntry(self):
@@ -139,13 +141,24 @@ class EntryTablePanel(QWidget):
         for index, column in enumerate(self.ktable.columns):
             if column.type != BIG_TEXT:
                 self.entryTableView.resizeColumnToContents(index)
+            else:
+                colWidth = self.calculateColumnHeaderWidth(index) + 20
+                self.entryTableView.setColumnWidth(index, colWidth)
                 
     def selectEntryAtIndex(self, rowIndex):
         modelIndex = self.entryTableModel.index(rowIndex, 0)
         if modelIndex.isValid():
             self.entryTableView.setCurrentIndex(modelIndex)
             
-    def setFont(self, font):
-        QWidget.setFont(font)
-        self.resizeColumns()
+    def calculateColumnHeaderWidth(self, index):
+#        font = self.entryTableView.font()
+#        painter = QPainter()
+#        painter.setFont(font)
+#        painter.fontMetrics()
+        fontMetrics = self.entryTableView.fontMetrics()
+        text = self.entryTableModel.headerData(index).toString()
+        width = fontMetrics.width(text)
         
+        return width
+        
+            

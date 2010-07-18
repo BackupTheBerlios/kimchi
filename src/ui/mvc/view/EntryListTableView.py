@@ -36,6 +36,7 @@ class EntryListTableView(ResizableFont, QTableView):
     def __init__(self, parent = None):
         super(EntryListTableView, self).__init__(parent)
         
+        self.parent = parent
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         
         #disable editing
@@ -60,4 +61,9 @@ class EntryListTableView(ResizableFont, QTableView):
 #        else:
 #            print 'Invalid selection'
 #        print 'selectionChanged %d' % selectedEntryId
+
+    def changeEvent(self, event):
+        QWidget.changeEvent(self, event)
+        if event.type() == QEvent.FontChange:
+            self.parent.resizeColumns()
 

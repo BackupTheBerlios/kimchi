@@ -40,7 +40,8 @@ SQL_FOR_CREATE_KCOLUMN = '''CREATE TABLE kcolumn (
     ktable_id INTEGER NOT NULL,
     label TEXT NOT NULL,
     type INTEGER NOT NULL DEFAULT (0),
-    visible INTEGER NOT NULL DEFAULT (1)
+    visible INTEGER NOT NULL DEFAULT (1),
+    seq_number INTEGER NOT NULL DEFAULT (0)
 )'''
 
 def createConfigTables(conn):

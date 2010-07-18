@@ -90,6 +90,7 @@ class EntryDisplayPanel(ResizableFont, QWidget):
             
             self.values.append(value)
         
+        layout.setColumnStretch(1,1)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(layout)
         mainLayout.addStretch()

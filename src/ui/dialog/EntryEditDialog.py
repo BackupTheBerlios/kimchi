@@ -32,17 +32,16 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from backend.domain.config.kcolumn import SMALL_TEXT
+from ui.widget.ResizableFont import ResizableFont
 
-class EntryEditDialog(QDialog):
-    
+class EntryEditContainer(ResizableFont, QWidget):
+
     def __init__(self, entry, ktable, parent = None):
-        super(EntryEditDialog, self).__init__(parent)
-        
-        self.setModal(True)
+        super(EntryEditContainer, self).__init__(parent)
         
         self.entry = entry
         
-        layout=QGridLayout()
+        layout = QGridLayout()
         
         # a dictionary of dialog editors mapped by the column name of the entry
         self.editors = {}
@@ -53,7 +52,7 @@ class EntryEditDialog(QDialog):
         
         for index, column in enumerate(self.columns):
             label = QLabel(column.label + ':')
-            label.setMaximumWidth(label.minimumSizeHint().width())
+#            label.setMaximumWidth(label.minimumSizeHint().width())
             layout.addWidget(label, index, 0)
             layout.setAlignment(label, Qt.AlignTop)
             
@@ -65,12 +64,28 @@ class EntryEditDialog(QDialog):
                 editor = QTextEdit(value)
 
             editor.setAlignment(Qt.AlignTop)
+#            editor = QLabel(column.label)
             layout.addWidget(editor, index, 1)
             layout.setAlignment(editor, Qt.AlignTop)
             
             
             self.editors[column.name] = editor
             
+        self.setLayout(layout)
+            
+            
+class EntryEditDialog(QDialog):
+    
+    def __init__(self, entry, ktable, parent = None):
+        super(EntryEditDialog, self).__init__(parent)
+        
+        self.setModal(True)
+        
+        self.entry = entry
+        
+        self.container = EntryEditContainer(entry, ktable, self)
+        
+        
         
         """
             Button box
@@ -91,15 +106,15 @@ class EntryEditDialog(QDialog):
         self.connect(buttonBox, SIGNAL("rejected()"),
                      self, SLOT("reject()"))
         
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(layout)
-        mainLayout.addStretch()
-        mainLayout.addWidget(buttonBox)
-        self.setLayout(mainLayout)
+        layout = QVBoxLayout()
+        layout.addWidget(self.container)
+        layout.addStretch()
+        layout.addWidget(buttonBox)
+        self.setLayout(layout)
     
     def accept(self):
-        for column in self.columns:
-            editor = self.editors[column.name]
+        for column in self.container.columns:
+            editor = self.container.editors[column.name]
             value = None
             if column.type == SMALL_TEXT:
                 value = editor.text()
@@ -111,8 +126,8 @@ class EntryEditDialog(QDialog):
         
         
     def reset(self):
-        for column in self.columns:
-            editor = self.editors[column.name]
+        for column in self.container.columns:
+            editor = self.container.editors[column.name]
             value = getattr(self.entry, column.name)
             editor.setText(value)
             

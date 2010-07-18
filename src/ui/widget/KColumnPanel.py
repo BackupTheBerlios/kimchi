@@ -47,6 +47,7 @@ class KColumnPanel(QWidget):
         
         label = QLabel('Columns:')
         self.kcolumnView = QTableView()
+        self.kcolumnView.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.kcolumnView.setModel(self.kcolumnModel)
         self.kcolumnView.setItemDelegate(kcolumnDelegate)
         

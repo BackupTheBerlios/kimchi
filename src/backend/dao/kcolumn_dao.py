@@ -45,7 +45,7 @@ def getListByKTable(ktable):
     
     kcolumns = []
     
-    sql = 'SELECT * FROM kcolumn WHERE ktable_id = ?'
+    sql = 'SELECT * FROM kcolumn WHERE ktable_id = ? ORDER BY seq_number'
     cursor = conn.cursor()
     cursor.execute(sql, (ktable.id, ))
     for row in cursor:

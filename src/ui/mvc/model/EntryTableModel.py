@@ -69,7 +69,7 @@ class EntryTableModel(QAbstractTableModel):
         
         return QVariant()
     
-    def headerData(self, section, orientation, role = Qt.DisplayRole):
+    def headerData(self, section, orientation = Qt.Horizontal, role = Qt.DisplayRole):
         
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal:

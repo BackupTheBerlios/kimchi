@@ -91,3 +91,4 @@ class MainPanel(QSplitter):
     def mainPanelDestroyed(self):
         self.saveMainPanelState()
         
+        
