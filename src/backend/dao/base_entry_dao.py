@@ -28,6 +28,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 '''
 from backend.domain.entry import Entry
+from backend.util import escapeSql
 
 conn = None
 
@@ -72,7 +73,8 @@ def add(entry, ktable):
     entryValues = ''
     for col in ktable.columns:
         entryColumns += col.name + ', '
-        entryValues += '\'' + getattr(entry, col.name) + '\', '
+        value = escapeSql(getattr(entry, col.name))
+        entryValues += '\'' + value + '\', '
     #remove last ', ' from both strings
     entryColumns = entryColumns[:-2]
     entryValues = entryValues[:-2]
@@ -89,7 +91,8 @@ def update(entry, ktable):
     
     params = ''
     for col in ktable.columns:
-        params += col.name + '=\'' + getattr(entry, col.name) + '\', '
+        value = escapeSql(getattr(entry, col.name))
+        params += col.name + '=\'' + value + '\', '
     params = params[:-2]
     
     sql = "UPDATE %s SET %s WHERE id = ?" % (ktable.name,

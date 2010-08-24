@@ -37,7 +37,8 @@ def loadFromRow(row):
     kcolumn.ktableId = row['ktable_id']
     kcolumn.label = row['label']
     kcolumn.type = row['type']
-    kcolumn.visible = (row['visible'] == 1) 
+    kcolumn.visible = (row['visible'] == 1)
+    kcolumn.seqNumber = row['seq_number'] 
     
     return kcolumn
 
@@ -56,13 +57,14 @@ def getListByKTable(ktable):
     
 def add(kcolumn):
     
-    sql = 'INSERT INTO kcolumn(ktable_id, label, type, visible)\
-        VALUES(?, ?, ?, ?)'
+    sql = 'INSERT INTO kcolumn(ktable_id, label, type, visible, seq_number)\
+        VALUES(?, ?, ?, ?, ?)'
     cursor = conn.cursor()
     cursor.execute(sql, (kcolumn.ktableId, 
                          kcolumn.label, 
                          kcolumn.type, 
-                         1 if kcolumn.visible else 0))
+                         1 if kcolumn.visible else 0,
+                         kcolumn.seqNumber))
     kcolumn.id=cursor.lastrowid
     conn.commit()
 
@@ -83,12 +85,14 @@ def update(kcolumn):
     
     sql = 'UPDATE kcolumn SET label = ?, ' + \
         'type = ?, ' + \
-        'visible = ? ' + \
+        'visible = ?, ' + \
+        'seq_number = ? ' + \
         'WHERE id = ? ' 
     cursor = conn.cursor()
     cursor.execute(sql, (kcolumn.label, 
                          kcolumn.type, 
                          1 if kcolumn.visible else 0,
+                         kcolumn.seqNumber,
                          kcolumn.id))
     conn.commit()
     

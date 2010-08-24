@@ -38,6 +38,7 @@ class KColumn(object):
         self.label = label
         self.visible = visible
         self.type = type
+        self.seqNumber = 0
         
     def __unicode__(self):
         return '(%s, %s, %s)' % (self.id, self.label, str(self.visible))

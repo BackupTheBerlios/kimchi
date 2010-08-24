@@ -50,6 +50,7 @@ class KColumnModel(QAbstractTableModel):
             return QVariant()
         
         kcolumn = self.columns[index.row()]
+#        kcolumn.seqNumber = index.row()
         columnIndex = index.column()
         
         if role == Qt.DisplayRole:
@@ -118,5 +119,13 @@ class KColumnModel(QAbstractTableModel):
 
     def getColumnByIndex(self, index):
         return self.columns[index.row()]
+    
+    def moveRow(self, src, dest):
+#        tmp = self.columns[src]
+#        self.columns[src] = self.columns[dest]
+#        self.columns[dest] = tmp
+        
+        self.columns[src], self.columns[dest] = self.columns[dest], self.columns[src] 
+        pass
     
         

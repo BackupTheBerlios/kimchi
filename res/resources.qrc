@@ -1,7 +1,9 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-<file alias="appIcon">icons/app.png</file>
 <file alias="dictionaryIcon">icons/dictionary.png</file>
+<file alias="fontIcon">icons/font.png</file>
+<file alias="zoomInIcon">icons/zoom-in.png</file>
+<file alias="zoomOutIcon">icons/zoom-out.png</file>
 </qresource>
 <qresource>
 	<file alias="kimchi_ro.qm">translations/kimchi_ro.qm</file>

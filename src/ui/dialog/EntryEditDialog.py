@@ -120,6 +120,7 @@ class EntryEditDialog(QDialog):
                 value = editor.text()
             else:
                 value = editor.toPlainText()
+            value = unicode(value)
             setattr(self.entry, column.name, value)
         
         QDialog.accept(self)

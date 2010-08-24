@@ -137,13 +137,14 @@ class EntryTablePanel(QWidget):
         self.emit(SIGNAL('entrySelected'), entry)
         
     def resizeColumns(self):
+        self.entryTableView.resizeColumnsToContents()
         # resize to content anything but BIG_TEXT columns
-        for index, column in enumerate(self.ktable.columns):
-            if column.type != BIG_TEXT:
-                self.entryTableView.resizeColumnToContents(index)
-            else:
-                colWidth = self.calculateColumnHeaderWidth(index) + 20
-                self.entryTableView.setColumnWidth(index, colWidth)
+#        for index, column in enumerate(self.ktable.columns):
+#            if column.type != BIG_TEXT:
+#                self.entryTableView.resizeColumnToContents(index)
+#            else:
+#                colWidth = self.calculateColumnHeaderWidth(index) + 20
+#                self.entryTableView.setColumnWidth(index, colWidth)
                 
     def selectEntryAtIndex(self, rowIndex):
         modelIndex = self.entryTableModel.index(rowIndex, 0)

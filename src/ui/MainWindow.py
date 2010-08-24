@@ -59,7 +59,8 @@ class MainWindow(QMainWindow):
         
         self.setWindowTitle(APP_NAME)
         
-        
+        self.fontSize = None
+        self.font = None
         
         self.restoreMainWindowState()
         
@@ -73,16 +74,33 @@ class MainWindow(QMainWindow):
         settings.setValue('MainWindow/Geometry', QVariant(self.saveGeometry()))
         settings.setValue('MainWindow/State', QVariant(self.saveState()))
         settings.setValue('Application/FontSize', QVariant(self.fontSize))
+        settings.setValue('Application/Font', QVariant(self.font.toString()))
         
     def restoreMainWindowState(self):
         settings=QSettings()
         self.restoreGeometry(settings.value('MainWindow/Geometry').toByteArray())
         self.restoreState(settings.value('MainWindow/State').toByteArray())
         
+        """try to restore the font settings"""
+        fontDescription = settings.value('Application/Font').toString()
+        ok = True
+        if fontDescription.isEmpty():
+            ok = False
+        defaultFont = qApp.font()
+        if not ok:
+            self.font = defaultFont
+        else:
+            self.font = QFont()
+            ok = self.font.fromString(fontDescription)
+            if not ok:
+                self.font = defaultFont
+        
+        
         self.fontSize, ok = settings.value('Application/FontSize').toInt()
         if not ok:
             self.fontSize = qApp.font().pointSize()
-        self.changeFontSize()
+        
+        self.updateFont()
         
     def closeEvent(self,event):
         self.saveMainWindowState()
@@ -119,10 +137,10 @@ class MainWindow(QMainWindow):
         fileMenu.addAction(fileRestoreBackupAction)
         
         
-        optionsMenu = self.menuBar().addMenu("&Dictionaries")
-        settingsAction = self.createAction("&Manage", 
-                self.showConfigDialog, "Ctrl+M", 'dictionaryIcon')        
-        optionsMenu.addAction(settingsAction)
+#        optionsMenu = self.menuBar().addMenu("&Dictionaries")
+#        settingsAction = self.createAction("&Manage", 
+#                self.showConfigDialog, "Ctrl+M", 'dictionaryIcon')        
+#        optionsMenu.addAction(settingsAction)
         
         helpMenu = self.menuBar().addMenu('&Help')
         aboutAction = self.createAction('&About %s' % APP_NAME, self.helpAbout, 
@@ -134,17 +152,22 @@ class MainWindow(QMainWindow):
         toolBar = self.addToolBar('toolBar')
         toolBar.setObjectName('toolBar')
         
-        chooseFontAction = self.createAction(self.trUtf8('Select font'),
-                                self.chooseFont)
-        increaseFontSizeAction = self.createAction(self.trUtf8('+'),
-                                self.increaseFontSize)
+        manageDictionariesAction = self.createAction(self.trUtf8('Manage dictionaries'),
+                                self.showConfigDialog, 'Ctrl+M', 'dictionaryIcon', self.trUtf8('Manage dictionaries'))
         
-        decreaseFontSizeAction = self.createAction(self.trUtf8('-'),
-                                self.decreaseFontSize)
+        chooseFontAction = self.createAction(self.trUtf8('Choose font'),
+                                self.chooseFont, None, 'fontIcon', self.trUtf8('Choose font'))
+        increaseFontSizeAction = self.createAction(self.trUtf8('Increase font size'),
+                                self.increaseFontSize, None, 'zoomInIcon', self.trUtf8('Increase font size'))
+        decreaseFontSizeAction = self.createAction(self.trUtf8('Decrease font size'),
+                                self.decreaseFontSize, None, 'zoomOutIcon', self.trUtf8('Decrease font size'))
         
+        toolBar.addAction(manageDictionariesAction)
+        toolBar.addSeparator()
         toolBar.addAction(chooseFontAction)
         toolBar.addAction(increaseFontSizeAction)
         toolBar.addAction(decreaseFontSizeAction)
+        
         
         
     def showConfigDialog(self):
@@ -193,21 +216,25 @@ class MainWindow(QMainWindow):
             
     def chooseFont(self):
 #        print self.font()
-        font, ok = QFontDialog.getFont(self.font(), self)
+        font, ok = QFontDialog.getFont(self.font, self)
         if ok:
-#            self.setFont(font)
-            QApplication.setFont(font,'ResizableFont')
+            self.font = font
+            self.fontSize = font.pointSize()
+            self.updateFont()
+
             
     def increaseFontSize(self):
         self.fontSize += 1
-        self.changeFontSize()
+        self.updateFont()
+
     
     def decreaseFontSize(self):
         self.fontSize -= 1
-        self.changeFontSize()
+        self.updateFont()
+
     
-    def changeFontSize(self):
-        font = qApp.font()
+    def updateFont(self):
+        font = self.font
         font.setPointSize(self.fontSize)
         qApp.setFont(font, 'ResizableFont')    
         

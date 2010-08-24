@@ -51,14 +51,19 @@ class KColumnPanel(QWidget):
         self.kcolumnView.setModel(self.kcolumnModel)
         self.kcolumnView.setItemDelegate(kcolumnDelegate)
         
+        self.upButton = QPushButton('Up')
+        self.downButton = QPushButton('Down')
+        
         self.addButton = QPushButton("Add")
         self.removeButton = QPushButton("Remove")
         
         
         """CONNECTIONS"""
         
-        self.connect(self.addButton, SIGNAL("clicked()"), self.addColumn)
-        self.connect(self.removeButton, SIGNAL("clicked()"), self.removeColumn)
+        self.connect(self.addButton, SIGNAL("clicked()"), self.addKColumn)
+        self.connect(self.removeButton, SIGNAL("clicked()"), self.removeKColumn)
+        self.connect(self.upButton, SIGNAL("clicked()"), self.moveUp)
+        self.connect(self.downButton, SIGNAL("clicked()"), self.moveDown)
         
         """LAYOUT"""
         
@@ -67,15 +72,25 @@ class KColumnPanel(QWidget):
         buttonsLayout.addWidget(self.addButton)
         buttonsLayout.addWidget(self.removeButton)
         
+        upDownLayout = QVBoxLayout()
+        upDownLayout.addStretch()
+        upDownLayout.addWidget(self.upButton)
+        upDownLayout.addWidget(self.downButton)
+        upDownLayout.addStretch()
+
+        hLayout = QHBoxLayout()
+        hLayout.addWidget(self.kcolumnView)
+        hLayout.addLayout(upDownLayout)
+        
         layout = QVBoxLayout()
         layout.addWidget(label)
-        layout.addWidget(self.kcolumnView)
+        layout.addLayout(hLayout)
         layout.addLayout(buttonsLayout)
         
         self.setLayout(layout)
         
 
-    def addColumn(self):
+    def addKColumn(self):
 #        print "addColumn"
         if self.kcolumnModel is None:
             return
@@ -87,7 +102,7 @@ class KColumnPanel(QWidget):
         self.kcolumnView.edit(index)
         
         
-    def removeColumn(self):
+    def removeKColumn(self):
 #        print "removeColumn"
         
         index = self.kcolumnView.currentIndex()
@@ -104,8 +119,41 @@ class KColumnPanel(QWidget):
         if answer == QMessageBox.Yes:
             row = index.row()
             self.kcolumnModel.removeRows(row)
+            
+    def moveUp(self):
+        index = self.kcolumnView.currentIndex()
+        if not index.isValid():
+            return
+        row = index.row()
+        if row > 0:
+            self.moveRow(row, row - 1)
+        
+    def moveDown(self):
+        index = self.kcolumnView.currentIndex()
+        if not index.isValid():
+            return
+        row = index.row()
+        if row < self.kcolumnModel.rowCount() - 1:
+            self.moveRow(row, row + 1)
+        
+        
+    def moveRow(self, src, dest):
+        sourceParent = self.kcolumnModel.index(src, 0)
+        destinationParent = self.kcolumnModel.index(dest, 0)
+        ok = self.kcolumnModel.beginMoveRows(sourceParent, src, src, destinationParent, dest)
+        if ok:
+            self.kcolumnModel.moveRow(src, dest)
+            self.kcolumnModel.endMoveRows()
+            self.kcolumnView.setCurrentIndex(destinationParent)
         
     def resetModel(self, ktable):
 #        print "resetModel"
         self.kcolumnModel = KColumnModel(ktable.columns)
         self.kcolumnView.setModel(self.kcolumnModel)
+        # select first row
+        self.selectRowAtIndex(0)
+        
+    def selectRowAtIndex(self, rowIndex):
+        modelIndex = self.kcolumnModel.index(rowIndex, 0)
+        if modelIndex.isValid():
+            self.kcolumnView.setCurrentIndex(modelIndex)

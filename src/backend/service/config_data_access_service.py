@@ -57,8 +57,9 @@ class ConfigDataAccessService(object):
     def addKTable(self, ktable):
         ktableDao.add(ktable)
         # this ktable columns have to be added too
-        for col in ktable.columns:
+        for index, col in enumerate(ktable.columns):
             col.ktableId = ktable.id
+            col.seqNumber = index
             kcolumnDao.add(col)
     
     
@@ -66,7 +67,8 @@ class ConfigDataAccessService(object):
         ktableDao.update(ktable)
         # add ktable new columns and
         # update existing ones
-        for col in ktable.columns:
+        for index, col in enumerate(ktable.columns):
+            col.seqNumber = index
             if col.id is None:
                 col.ktableId = ktable.id
                 kcolumnDao.add(col)
