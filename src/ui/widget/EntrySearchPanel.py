@@ -51,7 +51,7 @@ class EntrySearchPanel(ResizableFont, QWidget):
                 entrySearchWidget = EntrySearchWidget(column.name, column.label)
 #                entrySearchWidget = QLabel('ceva')
                 self.entrySearchWidgetList.append(entrySearchWidget)
-                label = QLabel(column.label + ":")
+                label = QLabel('<b>' + column.label + ':</b>')
 #                util.setRedBackground(label)
 #                util.setRedBackground(entrySearchWidget)
                 layout.addWidget(label, index, 0)

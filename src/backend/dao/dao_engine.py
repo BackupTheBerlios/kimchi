@@ -45,7 +45,6 @@ class DaoEngine(object):
         
         self.initConfigStorage()
     
-    
         
     def initConfigStorage(self):
         """Config Storage consists of the following tables:
@@ -53,13 +52,24 @@ class DaoEngine(object):
             kcolumn - holds the column definitions for user defined tables
         """
         sqlite3.enable_callback_tracebacks(True)
-        self.connection = sqlite3.connect(self.dbPath)
-        self.connection.row_factory=sqlite3.Row
-        
+        self.connection = self.getConnection()
         configStorageManager.createConfigTables(self.connection)
     
     def initUserStorage(self, config):
-        
         userStorageManager.createTablesForEntries(self.connection, config)
-
-
+        
+    def indexData(self, config):
+        """ most likely this method will be called
+            from a different thread, so we need to be sure that we supply a 
+            different connection object
+        """
+        connection = self.getConnection()
+        userStorageManager.indexData(connection, config)       
+    
+    def getConnection(self):
+        connection = sqlite3.connect(self.dbPath)
+        connection.row_factory=sqlite3.Row
+        
+        return connection
+    
+    

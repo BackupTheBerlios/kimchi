@@ -132,9 +132,14 @@ class MainWindow(QMainWindow):
         fileCreateBackupAction = self.createAction(self.trUtf8('Create backup'), self.createBackup)
         fileRestoreBackupAction = self.createAction(self.trUtf8('Restore backup'), self.restoreBackup)
         
-        fileMenu.addAction(fileQuitAction)
+        fileIndexDataAction = self.createAction(self.trUtf8('Index data'), self.indexData)
+        
         fileMenu.addAction(fileCreateBackupAction)
         fileMenu.addAction(fileRestoreBackupAction)
+        fileMenu.addSeparator()
+        fileMenu.addAction(fileIndexDataAction)
+        fileMenu.addSeparator()
+        fileMenu.addAction(fileQuitAction)
         
         
 #        optionsMenu = self.menuBar().addMenu("&Dictionaries")
@@ -236,5 +241,8 @@ class MainWindow(QMainWindow):
     def updateFont(self):
         font = self.font
         font.setPointSize(self.fontSize)
-        qApp.setFont(font, 'ResizableFont')    
+        qApp.setFont(font, 'ResizableFont')
+        
+    def indexData(self):
+        self.appManager.indexData()   
         

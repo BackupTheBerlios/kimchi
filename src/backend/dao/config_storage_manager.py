@@ -29,13 +29,14 @@ POSSIBILITY OF SUCH DAMAGE.
 '''
 KTABLE_TABLE_NAME = 'ktable'
 KCOLUMN_TABLE_NAME = 'kcolumn'
+KINDEX_TABLE_NAME = 'kindex'
 
-SQL_FOR_CREATE_KTABLE = '''CREATE TABLE ktable ( 
+SQL_FOR_CREATE_KTABLE = '''CREATE TABLE IF NOT EXISTS ktable ( 
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
     label VARCHAR NOT NULL
 )'''
 
-SQL_FOR_CREATE_KCOLUMN = '''CREATE TABLE kcolumn (
+SQL_FOR_CREATE_KCOLUMN = '''CREATE TABLE IF NOT EXISTS kcolumn (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     ktable_id INTEGER NOT NULL,
     label TEXT NOT NULL,
@@ -44,25 +45,31 @@ SQL_FOR_CREATE_KCOLUMN = '''CREATE TABLE kcolumn (
     seq_number INTEGER NOT NULL DEFAULT (0)
 )'''
 
+SQL_FOR_CREATE_KINDEX = '''CREATE TABLE IF NOT EXISTS kindex ( 
+    id INTEGER NOT NULL PRIMARY KEY, 
+    ktable_id INTEGER NOT NULL,
+    row_id INTEGER NOT NULL,
+    contents TEXT NOT NULL
+)'''
+
 def createConfigTables(conn):
     createDBTable(conn, KTABLE_TABLE_NAME, SQL_FOR_CREATE_KTABLE)
     createDBTable(conn, KCOLUMN_TABLE_NAME, SQL_FOR_CREATE_KCOLUMN)
+    createDBTable(conn, KINDEX_TABLE_NAME, SQL_FOR_CREATE_KINDEX)
     
 def createDBTable(conn, tableName, sqlForCreate):
     
     try:    
         
-        """check to see if the table already exists"""
-        rs = conn.execute("SELECT * FROM sqlite_master WHERE type = 'table' AND name = '%s'" % (tableName, ))
-        r = rs.fetchone()
-        
-        if r is None:
-            """table doesn't exists yet, we are creating it now"""
-            conn.execute(sqlForCreate)
+#        """check to see if the table already exists"""
+#        rs = conn.execute("SELECT * FROM sqlite_master WHERE type = 'table' AND name = '%s'" % (tableName, ))
+#        r = rs.fetchone()
+#        
+#        if r is None:
+#            """table doesn't exists yet, we are creating it now"""
+        conn.execute(sqlForCreate)
         
         
     except Exception, e:
         print e
 
-
-  

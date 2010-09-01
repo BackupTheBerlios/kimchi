@@ -96,4 +96,6 @@ class ApplicationManager(object):
     def restoreBackup(self, backupPath):
         storageManager.restoreBackup(backupPath)
         
+    def indexData(self):
+        self._daoEngine.indexData(self.configEngine.config)
         

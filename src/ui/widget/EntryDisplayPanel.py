@@ -66,23 +66,14 @@ class EntryDisplayPanel(ResizableFont, QWidget):
         columns = ktable.columns
         
         for index, column in enumerate(columns):
-            label = QLabel(column.label + ':')
+            label = QLabel('<b>' + column.label + ':</b>')
 #            label.setMaximumWidth(label.minimumSizeHint().width())
             layout.addWidget(label, index, 0)
             layout.setAlignment(label, Qt.AlignTop)
-#            util.setGreenBackground(label)
             
-            value = None
-            if column.type == SMALL_TEXT:
-                value = QLabel('N/A')
-                value.setWordWrap(True)
-            else:
-                value = QTextEdit('N/A')
-                value.setReadOnly(True)
-#            label.setWordWrap(True)
-#            labelContainer = LabelContainer(label)
-#            layout.addWidget(labelContainer, index, 1)
-#            util.setGreenBackground(label)
+            value = QLabel('N/A')
+            value.setWordWrap(True)
+            value.setTextInteractionFlags(Qt.TextBrowserInteraction)
             value.setAlignment(Qt.AlignTop)
             layout.addWidget(value, index, 1)
             layout.setAlignment(value, Qt.AlignTop)

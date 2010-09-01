@@ -31,6 +31,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from ui.widget.DictionaryContainer import DictionaryContainer
 from ui.widget.DictionarySelectorPanel import DictionarySelectorPanel
+from ui.widget.GlobalSearchPanel import GlobalSearchPanel
 
 
 class MainPanel(QSplitter):
@@ -44,6 +45,7 @@ class MainPanel(QSplitter):
         
                 
         self.dictSelectorPanel = DictionarySelectorPanel(self.config, self)
+        self.globalSearchPanel = GlobalSearchPanel(self)
         self.dictContainerPanel = QStackedWidget(self)
         self.dictWidgets = {}
         
@@ -64,7 +66,12 @@ class MainPanel(QSplitter):
         """ LAYOUT """
         self.setOrientation(Qt.Horizontal)
         
-        self.addWidget(self.dictSelectorPanel)
+        self.leftSplitter = QSplitter()
+        self.leftSplitter.setOrientation(Qt.Vertical)
+        self.leftSplitter.addWidget(self.dictSelectorPanel)
+        self.leftSplitter.addWidget(self.globalSearchPanel)
+        
+        self.addWidget(self.leftSplitter)
         self.addWidget(self.dictContainerPanel)
 
         self.mainPanelState = None
