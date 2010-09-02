@@ -85,6 +85,15 @@ def add(entry, ktable):
     cursor = conn.cursor()
     cursor.execute(sql)
     entry.id=cursor.lastrowid
+    
+    """
+    Insert values in the kindex table too    
+    """
+    for col in ktable.columns:
+        value = escapeSql(getattr(entry, col.name))
+        sql = 'INSERT INTO kindex(ktable_id, row_id, contents) VALUES(?, ?, ?)' 
+        cursor.execute(sql, (ktable.id, entry.id, value))
+    
     conn.commit()
 
 def update(entry, ktable):
@@ -99,6 +108,20 @@ def update(entry, ktable):
                                              params)
     cursor = conn.cursor()
     cursor.execute(sql, (entry.id, ))
+    
+    """
+    Update values in the kindex table too    
+    First, remove index entries associated with this entry 
+    """
+    cursor.execute('DELETE FROM kindex WHERE ktable_id = ? AND row_id = ?', (ktable.id, entry.id))
+    """
+    Then insert new values in the kindex table     
+    """
+    for col in ktable.columns:
+        value = escapeSql(getattr(entry, col.name))
+        sql = 'INSERT INTO kindex(ktable_id, row_id, contents) VALUES(?, ?, ?)' 
+        cursor.execute(sql, (ktable.id, entry.id, value))
+    
     conn.commit()
     
     
@@ -106,6 +129,8 @@ def remove(entry, ktable):
     sql = 'DELETE FROM %s WHERE id = ?' % (ktable.name, )
     cursor = conn.cursor()
     cursor.execute(sql, (entry.id, ))
+    cursor.execute('DELETE FROM kindex WHERE ktable_id = ? AND row_id = ?', (ktable.id, entry.id))
+    
     conn.commit()
     
 def getEntriesByFilter(ktable, columnName, filterText):
