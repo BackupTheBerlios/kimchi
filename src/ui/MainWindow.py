@@ -30,7 +30,8 @@ POSSIBILITY OF SUCH DAMAGE.
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from ui.widget.MainPanel import MainPanel
+from ui.widget.EditPanel import EditPanel
+from ui.widget.GlobalSearchPanel import GlobalSearchPanel
 from ui.dialog.ConfigDialog import ConfigDialog
 
 from properties import APP_NAME, APP_ABOUT
@@ -40,6 +41,8 @@ import os
 from datetime import datetime
 from backend.service.storage_manager import appFilePath
 from ui.dialog.FileDialogWithValidation import FileDialogWithValidation
+from time import time
+
 
 class MainWindow(QMainWindow):
     
@@ -54,8 +57,13 @@ class MainWindow(QMainWindow):
         self.createMenu()
         self.createToolBar()
         
-        self.mainPanel = None
-        self.initMainPanel()
+        
+        self.tabWidget = QTabWidget()
+        self.editPanel = None
+        self.searchPanel = None
+        
+        self.initMainWindow()
+        self.setCentralWidget(self.tabWidget)
         
         self.setWindowTitle(APP_NAME)
         
@@ -64,9 +72,16 @@ class MainWindow(QMainWindow):
         
         self.restoreMainWindowState()
         
-    def initMainPanel(self):
-        self.mainPanel = MainPanel(self.appManager)
-        self.setCentralWidget(self.mainPanel)
+    def initMainWindow(self):
+        self.editPanel = EditPanel(self.appManager)
+        self.searchPanel = GlobalSearchPanel(self.appManager)
+        
+        self.tabWidget.clear()
+        self.tabWidget.insertTab(0,self.editPanel, self.trUtf8('Edit'))
+        self.tabWidget.insertTab(1, self.searchPanel, self.trUtf8('Search'))
+#        self.tabWidget.setCurrentIndex(1)
+        
+        
         
         
     def saveMainWindowState(self):
@@ -179,7 +194,11 @@ class MainWindow(QMainWindow):
         configDialog = ConfigDialog(self.appManager.configEngine.config, self)
         if configDialog.exec_():
             self.appManager.updateConfiguration(configDialog.config)
-            self.initMainPanel()
+            t0 = time()
+            self.initMainWindow()
+            t1 = time()
+            print 'initMainWindow %f' % (t1-t0, )
+            
             
     def helpAbout(self):
         QMessageBox.about(self, 'About %s' % APP_NAME,

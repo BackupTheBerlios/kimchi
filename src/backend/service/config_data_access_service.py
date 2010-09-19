@@ -34,11 +34,12 @@ class ConfigDataAccessService(object):
     
     def __init__(self, connection):
         self.initDaos(connection)
+        self.conn = connection
 
     def initDaos(self, connection):
         ktableDao.conn = connection
         kcolumnDao.conn = connection
-    
+        
     
     def getAllKTables(self):
         
@@ -61,6 +62,8 @@ class ConfigDataAccessService(object):
             col.ktableId = ktable.id
             col.seqNumber = index
             kcolumnDao.add(col)
+        
+        self.conn.commit()
     
     
     def updateKTable(self, ktable):
@@ -75,13 +78,19 @@ class ConfigDataAccessService(object):
             else:
                 kcolumnDao.update(col)
         
+        self.conn.commit()
+        
     def removeKTable(self, ktable):
         # remove table columns first
         kcolumnDao.removeByKTable(ktable)
         ktableDao.remove(ktable)
         
+        self.conn.commit()
+        
     def removeKTables(self, ktables):
         ktableDao.removeMultiple(ktables)
+        
+        self.conn.commit()
     
     """
     KColumn related
@@ -94,6 +103,8 @@ class ConfigDataAccessService(object):
 #    
     def removeKColumns(self, kcolumns):
         kcolumnDao.removeMultiple(kcolumns)
+        
+        self.conn.commit()
         
 #    def addKColumn(self, kcolumn):
 #        kcolumnDao.save(kcolumn)

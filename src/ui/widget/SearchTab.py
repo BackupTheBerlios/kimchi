@@ -27,65 +27,27 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 '''
-from backend.domain.config.ktable import KTable
-conn = None
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
-def loadFromRow(row):
-    
-    ktable = KTable()
-    ktable.id = row['id']
-    ktable.label = row['label']
-    
-    return ktable
 
-def getList():
+class SearchTab(QWidget):
     
-    ktables = []
-    
-    sql = 'SELECT * FROM ktable'
-    cursor = conn.cursor()
-    cursor.execute(sql)
-    for row in cursor:
-        ktable = loadFromRow(row)
-        ktables.append(ktable)
+    def __init__(self, parent = None):
+        super(SearchTab, self).__init__(parent)
         
-    return ktables
-    
-def add(ktable):
-    
-    sql = 'INSERT INTO ktable(label) VALUES(?)'
-    cursor = conn.cursor()
-    cursor.execute(sql, (ktable.label, ))
-    ktable.id=cursor.lastrowid
-#    conn.commit()
+        label = QLabel('test')
+        self.lineEdit = QLineEdit()
+        self.lineEdit.setMaximumWidth(150)
 
+        layout=QVBoxLayout()
+        layout.addWidget(label)
+        layout.addWidget(self.lineEdit)
+        
+        self.setLayout(layout)
+        
+        
 
-def get(id):
+        
     
-    sql = 'SELECT * FROM ktable WHERE id = ?'
-    cursor = conn.cursor()
-    cursor.execute(sql, (id, ))
-    row = cursor.fetchone()
-    
-    ktable = loadFromRow(row)
-    
-    return ktable
-
-
-def update(ktable):
-    
-    sql = 'UPDATE ktable SET label = ? WHERE id = ?'
-    cursor = conn.cursor()
-    cursor.execute(sql, (ktable.label, ktable.id))
-#    conn.commit()
-    
-def remove(ktable):
-    sql = 'DELETE FROM ktable WHERE id = ?'
-    cursor = conn.cursor()
-    cursor.execute(sql, (ktable.id, ))
-#    conn.commit()
-    
-def removeMultiple(ktables):
-    for ktable in ktables:
-        remove(ktable)
-    
+        

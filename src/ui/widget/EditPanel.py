@@ -34,10 +34,10 @@ from ui.widget.DictionarySelectorPanel import DictionarySelectorPanel
 from ui.widget.GlobalSearchPanel import GlobalSearchPanel
 
 
-class MainPanel(QSplitter):
+class EditPanel(QSplitter):
     
     def __init__(self, appManager, parent = None):
-        super(MainPanel, self).__init__(parent)
+        super(EditPanel, self).__init__(parent)
         
         self.config = appManager.configEngine.config
         self.appManager = appManager
@@ -60,7 +60,7 @@ class MainPanel(QSplitter):
                      self.updateDictContainerPanel)
         
         # for saving the splitter state
-        self.connect(self, SIGNAL('splitterMoved(int, int)'), self.updateMainPanelState)
+        self.connect(self, SIGNAL('splitterMoved(int, int)'), self.updateEditPanelState)
         self.connect(self, SIGNAL('destroyed()'), self.mainPanelDestroyed)
         
         """ LAYOUT """
@@ -75,7 +75,7 @@ class MainPanel(QSplitter):
         self.addWidget(self.dictContainerPanel)
 
         self.mainPanelState = None
-        self.restoreMainPanelState()
+        self.restoreEditPanelState()
         
         
     
@@ -83,19 +83,19 @@ class MainPanel(QSplitter):
         dictContainer = self.dictWidgets[ktable]
         self.dictContainerPanel.setCurrentWidget(dictContainer)
         
-    def updateMainPanelState(self):
+    def updateEditPanelState(self):
         self.mainPanelState = self.saveState()
         
-    def saveMainPanelState(self):
+    def saveEditPanelState(self):
         settings=QSettings()
-        settings.setValue('MainPanel/State', QVariant(self.mainPanelState))
+        settings.setValue('EditPanel/State', QVariant(self.mainPanelState))
         
-    def restoreMainPanelState(self):
+    def restoreEditPanelState(self):
         settings=QSettings()
-        self.mainPanelState = settings.value('MainPanel/State').toByteArray() 
+        self.mainPanelState = settings.value('EditPanel/State').toByteArray() 
         self.restoreState(self.mainPanelState)
         
     def mainPanelDestroyed(self):
-        self.saveMainPanelState()
+        self.saveEditPanelState()
         
         

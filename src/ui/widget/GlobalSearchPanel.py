@@ -35,7 +35,7 @@ from PyQt4.QtGui import *
 
 class GlobalSearchPanel(QWidget):
     
-    def __init__(self, parent = None):
+    def __init__(self, appManager, parent = None):
         super(GlobalSearchPanel, self).__init__(parent)
                 
         self.lineEdit = QLineEdit()

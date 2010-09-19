@@ -66,7 +66,7 @@ def add(kcolumn):
                          1 if kcolumn.visible else 0,
                          kcolumn.seqNumber))
     kcolumn.id=cursor.lastrowid
-    conn.commit()
+#    conn.commit()
 
 
 def get(id):
@@ -94,13 +94,13 @@ def update(kcolumn):
                          1 if kcolumn.visible else 0,
                          kcolumn.seqNumber,
                          kcolumn.id))
-    conn.commit()
+#    conn.commit()
     
 def remove(kcolumn):
     sql = 'DELETE FROM kcolumn WHERE id = ?'
     cursor = conn.cursor()
     cursor.execute(sql, (kcolumn.id, ))
-    conn.commit()
+#    conn.commit()
     
 def removeMultiple(kcolumns):
     for kcolumn in kcolumns:
@@ -110,5 +110,5 @@ def removeByKTable(ktable):
     sql = 'DELETE FROM kcolumn WHERE ktable_id = ?'
     cursor = conn.cursor()
     cursor.execute(sql, (ktable.id, ))
-    conn.commit()
+#    conn.commit()
     

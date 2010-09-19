@@ -35,6 +35,7 @@ from backend.service.config_data_access_service import ConfigDataAccessService
 import backend.service.storage_manager as storageManager
 
 from copy import copy
+from time import time
 
 class ApplicationManager(object):
     
@@ -75,8 +76,16 @@ class ApplicationManager(object):
         self.dataAccessService = DataAccessService(self._daoEngine.connection)
         
     def updateConfiguration(self, newConfig):
+        t0 = time()
         self.configEngine.update(newConfig)
+        t1 = time()
+        print 'configEngineUpdate %f' % (t1-t0, )
+        
+        t0 = time()
         self.initDataAccessService()
+        t1 = time()
+        print 'initDataAccess %f' % (t1-t0, )
+        
         
     @property
     def appStorageDir(self):
