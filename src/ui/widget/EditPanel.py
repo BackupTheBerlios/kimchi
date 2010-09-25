@@ -45,7 +45,7 @@ class EditPanel(QSplitter):
         
                 
         self.dictSelectorPanel = DictionarySelectorPanel(self.config, self)
-        self.globalSearchPanel = GlobalSearchPanel(self)
+#        self.globalSearchPanel = GlobalSearchPanel(self, appManager)
         self.dictContainerPanel = QStackedWidget(self)
         self.dictWidgets = {}
         
@@ -69,7 +69,7 @@ class EditPanel(QSplitter):
         self.leftSplitter = QSplitter()
         self.leftSplitter.setOrientation(Qt.Vertical)
         self.leftSplitter.addWidget(self.dictSelectorPanel)
-        self.leftSplitter.addWidget(self.globalSearchPanel)
+#        self.leftSplitter.addWidget(self.globalSearchPanel)
         
         self.addWidget(self.leftSplitter)
         self.addWidget(self.dictContainerPanel)

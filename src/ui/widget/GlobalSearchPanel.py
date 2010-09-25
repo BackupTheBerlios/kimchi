@@ -31,18 +31,24 @@ POSSIBILITY OF SUCH DAMAGE.
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from ui.widget.ResizableFont import ResizableFont
 
 
-class GlobalSearchPanel(QWidget):
+class GlobalSearchPanel(ResizableFont, QWidget):
     
     def __init__(self, appManager, parent = None):
         super(GlobalSearchPanel, self).__init__(parent)
+        
+        self.searchService = appManager.searchService
                 
         self.lineEdit = QLineEdit()
         self.lineEdit.setMaximumWidth(150)
+        
+        self.searchResultContainer = QTextEdit()
 
         layout=QVBoxLayout()
         layout.addWidget(self.lineEdit)
+        layout.addWidget(self.searchResultContainer)
         
         self.setLayout(layout)
         
@@ -50,5 +56,16 @@ class GlobalSearchPanel(QWidget):
     
     
     def searchTextChanged(self):
-        print 'searchTextChanged:%s' % self.lineEdit.text()
+        searchText = self.lineEdit.text()
+#        print 'searchTextChanged:%s' % (searchText, )
+        searchResultEntryList = self.searchService.searchForText(searchText)
+        self.updateResultContainer(searchResultEntryList)
+        
+    def updateResultContainer(self, searchResultEntryList):
+        self.searchResultContainer.clear()
+        for entry in searchResultEntryList:
+            line = u''
+            for value in entry.content:
+                line += unicode(value) + ' '
+            self.searchResultContainer.append(line)
         

@@ -27,47 +27,39 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 '''
+from backend.domain.search_result_entry import SearchResultEntry
 
-import sqlite3
+conn = None
 
-import user_storage_manager as userStorageManager
-import config_storage_manager as configStorageManager
+def loadFromRow(row, ktableId):
+    
+    entry = SearchResultEntry()
+    entry.ktableId = ktableId
+    entry.id = row['id']
+    for i in range(1, len(row)):
+        if row[i]:
+            entry.addValue(row[i])
+    
+    return entry
 
-class DaoEngine(object):
+
+def getEntries(ktableId, entryIds):
     
-    def __init__(self, dbPath):
-        
-        self.dbPath = dbPath
-        
-        """This is the default connection
-        If we want to access the db from a different thread(for instance for indexing)
-        we have to use another connection
-        """
-        self.connection = self.getNewConnection()
-        
-        self.initConfigStorage()
+    list = []
     
+    rowIdsStr = '('
+    for entryId in entryIds:
+        rowIdsStr += str(entryId) + ', '
+    rowIdsStr = rowIdsStr[:-2]
+    rowIdsStr += ')'
+     
+    sql = 'SELECT * FROM %s WHERE id IN %s' % ('ktable_' + str(ktableId),
+                                                rowIdsStr)
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    for row in cursor:
+        entry = loadFromRow(row, ktableId)
+        list.append(entry)
         
-    def initConfigStorage(self):
-        """Config Storage consists of the following tables:
-            ktable - holds the definitions for user defined tables 
-            kcolumn - holds the column definitions for user defined tables
-        """
-#        self.connection = self.createConnection()
-        configStorageManager.createConfigTables(self.connection)
-    
-    def initUserStorage(self, config):
-        userStorageManager.createTablesForEntries(self.connection, config)
-        
-    
-    def createConnection(self):
-        sqlite3.enable_callback_tracebacks(True)
-        connection = sqlite3.connect(self.dbPath)
-        connection.row_factory=sqlite3.Row
-        
-        return connection
-    
-    def getNewConnection(self):
-        return self.createConnection()
-    
+    return list
     

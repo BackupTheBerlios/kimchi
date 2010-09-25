@@ -36,6 +36,8 @@ import backend.service.storage_manager as storageManager
 
 from copy import copy
 from time import time
+from backend.service.indexing_service import IndexingService
+from backend.service.search_service import SearchService
 
 class ApplicationManager(object):
     
@@ -45,26 +47,43 @@ class ApplicationManager(object):
         
         self.dataAccessService = None
         self.configEngine = None
+        self.indexingService = None
+        self.searchService = None
+        
         
         self.initServices()
         
     def initServices(self):
         
         """
-      
+        DAO ENGINE
         """
         dbPath = copy(storageManager.appFilePath)
         self._daoEngine = DaoEngine(dbPath)
         
         """
-            configEngine reads current configuration 
+        CONFIG ENGINE    configEngine reads current configuration 
         """
         self.initConfigEngine()
         
         """
-        
+        DATA ACCESS SERVICE
         """
         self.initDataAccessService()
+        
+        """
+        INDEXING SERVICE
+        """
+        # for the indexing service we need a different connection
+        conn = self._daoEngine.getNewConnection()
+        self.indexingService = IndexingService(self.configEngine.config, conn)
+        
+        """
+        SEARCH SERVICE
+        """
+        # for the indexing service we need a different connection
+        conn = self._daoEngine.connection
+        self.searchService = SearchService(conn)
         
 
     def initConfigEngine(self):
@@ -106,5 +125,5 @@ class ApplicationManager(object):
         storageManager.restoreBackup(backupPath)
         
     def indexData(self):
-        self._daoEngine.indexData(self.configEngine.config)
+        self.indexingService.indexData()
         

@@ -27,27 +27,50 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 '''
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+
+from backend.util import escapeSql
 
 
-class SearchTab(QWidget):
+
+def indexData(conn, config):
+    print 'indexing...'
     
-    def __init__(self, parent = None):
-        super(SearchTab, self).__init__(parent)
-        
-        label = QLabel('test')
-        self.lineEdit = QLineEdit()
-        self.lineEdit.setMaximumWidth(150)
-
-        layout=QVBoxLayout()
-        layout.addWidget(label)
-        layout.addWidget(self.lineEdit)
-        
-        self.setLayout(layout)
-        
-        
-
-        
+    readCursor = conn.cursor()
+    writeCursor = conn.cursor()
     
+    # delete everithing from kindex table
+    writeCursor.execute('DELETE FROM kindex')
+    
+    for ktable in config.tables:
+        indexTable(ktable, readCursor, writeCursor)
         
+    conn.commit()
+    readCursor.close()
+    writeCursor.close()
+    
+#    x = 10
+#    y = 5
+#    while True:
+#        z = x * y
+#        x += 1
+#        y += 1
+#        if x > 100 and y > 150:
+#            x = 1;
+#            y = 1;
+#        print 'x = %d, y = %d, z = %d' % (x, y, z)
+
+def indexTable(ktable, readCursor, writeCursor):
+    
+    
+    rs = readCursor.execute('SELECT * FROM %s' % (ktable.name, ))
+    while True:
+        row = rs.fetchone()
+        if row is None:
+            break
+        rowId = row[0]
+        for i in range(1, len(row)):
+            if row[i]:
+                sql = 'INSERT INTO kindex(ktable_id, row_id, contents) VALUES(%d, %d, \'%s\')' % (ktable.id, rowId, escapeSql(row[i]))
+                writeCursor.execute(sql)
+
+

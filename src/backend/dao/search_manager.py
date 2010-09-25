@@ -28,46 +28,27 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 '''
 
-import sqlite3
 
-import user_storage_manager as userStorageManager
-import config_storage_manager as configStorageManager
-
-class DaoEngine(object):
+def searchIndexForText(conn, text):
+    """
+    returns a list of (ktable_id, [list of row ids])
+    which contains the search term
+    """
+    list = []
+    currentTableId = 0
     
-    def __init__(self, dbPath):
-        
-        self.dbPath = dbPath
-        
-        """This is the default connection
-        If we want to access the db from a different thread(for instance for indexing)
-        we have to use another connection
-        """
-        self.connection = self.getNewConnection()
-        
-        self.initConfigStorage()
+    sql = 'SELECT DISTINCT ktable_id, row_id FROM kindex WHERE contents LIKE \'%%%s%%\'' % (text, )
+    cursor = conn.cursor()
+    cursor.execute(sql)
     
+    rowIds = None
+    for row in cursor:
+        tableId = row['ktable_id']
+        if tableId != currentTableId:
+            rowIds = []
+            currentTableId = tableId
+            list.append((currentTableId, rowIds))
+        rowIds.append(row['row_id'])
         
-    def initConfigStorage(self):
-        """Config Storage consists of the following tables:
-            ktable - holds the definitions for user defined tables 
-            kcolumn - holds the column definitions for user defined tables
-        """
-#        self.connection = self.createConnection()
-        configStorageManager.createConfigTables(self.connection)
-    
-    def initUserStorage(self, config):
-        userStorageManager.createTablesForEntries(self.connection, config)
-        
-    
-    def createConnection(self):
-        sqlite3.enable_callback_tracebacks(True)
-        connection = sqlite3.connect(self.dbPath)
-        connection.row_factory=sqlite3.Row
-        
-        return connection
-    
-    def getNewConnection(self):
-        return self.createConnection()
-    
+    return list
     

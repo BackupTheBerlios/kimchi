@@ -27,47 +27,22 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 '''
+import backend.dao.indexing_manager as indexingManager
 
-import sqlite3
-
-import user_storage_manager as userStorageManager
-import config_storage_manager as configStorageManager
-
-class DaoEngine(object):
+class IndexingService(object):
     
-    def __init__(self, dbPath):
-        
-        self.dbPath = dbPath
-        
-        """This is the default connection
-        If we want to access the db from a different thread(for instance for indexing)
-        we have to use another connection
+    def __init__(self, config, conn):
+        self.conn = conn
+        self.config = config
+
+
+    def indexData(self):
+        """ most likely this method will be called
+            from a different thread, so we need to be sure that we supply a 
+            different connection object
         """
-        self.connection = self.getNewConnection()
-        
-        self.initConfigStorage()
+        indexingManager.indexData(self.conn, self.config) 
+    
     
         
-    def initConfigStorage(self):
-        """Config Storage consists of the following tables:
-            ktable - holds the definitions for user defined tables 
-            kcolumn - holds the column definitions for user defined tables
-        """
-#        self.connection = self.createConnection()
-        configStorageManager.createConfigTables(self.connection)
-    
-    def initUserStorage(self, config):
-        userStorageManager.createTablesForEntries(self.connection, config)
-        
-    
-    def createConnection(self):
-        sqlite3.enable_callback_tracebacks(True)
-        connection = sqlite3.connect(self.dbPath)
-        connection.row_factory=sqlite3.Row
-        
-        return connection
-    
-    def getNewConnection(self):
-        return self.createConnection()
-    
     

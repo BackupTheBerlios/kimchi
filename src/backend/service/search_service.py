@@ -27,47 +27,27 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 '''
+import backend.dao.search_result_entry_dao as searchResultEntryDao
+import backend.dao.search_manager as searchManager
 
-import sqlite3
-
-import user_storage_manager as userStorageManager
-import config_storage_manager as configStorageManager
-
-class DaoEngine(object):
+class SearchService(object):
     
-    def __init__(self, dbPath):
+    def __init__(self, conn):
+        self.conn = conn
+        searchResultEntryDao.conn = conn
         
-        self.dbPath = dbPath
-        
-        """This is the default connection
-        If we want to access the db from a different thread(for instance for indexing)
-        we have to use another connection
+    def searchForText(self, text):
+        """returns a list of SearchResultEntry objects
         """
-        self.connection = self.getNewConnection()
-        
-        self.initConfigStorage()
+        list = []
+        if text:
+            indexList = searchManager.searchIndexForText(self.conn, text)
+            for (ktableId, entryIds) in indexList:
+                entries = searchResultEntryDao.getEntries(ktableId, entryIds)
+                list.extend(entries)
+#        print list
+        return list
+
     
         
-    def initConfigStorage(self):
-        """Config Storage consists of the following tables:
-            ktable - holds the definitions for user defined tables 
-            kcolumn - holds the column definitions for user defined tables
-        """
-#        self.connection = self.createConnection()
-        configStorageManager.createConfigTables(self.connection)
-    
-    def initUserStorage(self, config):
-        userStorageManager.createTablesForEntries(self.connection, config)
-        
-    
-    def createConnection(self):
-        sqlite3.enable_callback_tracebacks(True)
-        connection = sqlite3.connect(self.dbPath)
-        connection.row_factory=sqlite3.Row
-        
-        return connection
-    
-    def getNewConnection(self):
-        return self.createConnection()
-    
     
